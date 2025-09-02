@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Activity Cards</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8;
+            background-image: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+            min-height: 100vh;
+        }
+        .card-wrapper {
+            perspective: 1000px;
+        }
+        .card {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            position: relative;
+            width: 100%;
+            height: 200px; /* Fixed height for consistent cards */
+        }
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border-width: 2px;
+            text-align: center;
+        }
+        .card-front {
+            background-color: #f0f4f8;
+            transform: rotateY(0deg);
+        }
+        .card-back {
+            transform: rotateY(180deg);
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+        }
+        
+        .card-1 .card-back { background-color: #ffe4e6; border-color: #f472b6; }
+        .card-2 .card-back { background-color: #dcfce7; border-color: #22c55e; }
+        .card-3 .card-back { background-color: #e0f2fe; border-color: #3b82f6; }
+        .card-4 .card-back { background-color: #f3e8ff; border-color: #a855f7; }
+        .card-5 .card-back { background-color: #fffbeb; border-color: #f59e0b; }
+        .card-6 .card-back { background-color: #f0f9ff; border-color: #0ea5e9; }
+
+        .hidden-section {
+            display: none;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+            animation-fill-mode: forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Custom radio button styling */
+        .radio-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            background-color: #e5e7eb;
+            color: #4b5563;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .radio-button.selected {
+            background-color: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="max-w-5xl mx-auto space-y-8 pb-12">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-center text-gray-900 mb-4">Classroom Connection</h1>
+        <p class="text-center text-gray-600 max-w-2xl mx-auto mb-10">
+            Click on a card below to reveal a question, then shuffle when you're ready for more!
+        </p>
+
+        <!-- Loading spinner for Firebase -->
+        <div id="loadingSpinner" class="text-center text-gray-500 mt-8">
+            <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-2">Connecting to the database...</p>
+        </div>
+
+        <!-- Main UI -->
+        <div id="mainUI" class="hidden-section">
+
+            <!-- Question Cards -->
+            <div id="card-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card-wrapper">
+                    <div class="card card-1" data-question="Thoughts/Feelings about school so far (It's day 2 of school by the way)">
+                        <div class="card-front card-face rounded-xl p-6 flex flex-col items-center justify-center gap-4">
+                            <svg class="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="card-back card-face rounded-xl p-6">
+                            <h2 class="text-xl font-bold text-gray-800">Thoughts/Feelings about the school so far (It's day 2 of school by the way)</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-wrapper">
+                    <div class="card card-2" data-question="Something I can teach to the class...">
+                        <div class="card-front card-face rounded-xl p-6 flex flex-col items-center justify-center gap-4">
+                            <svg class="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="card-back card-face rounded-xl p-6">
+                            <h2 class="text-xl font-bold text-gray-800">Something I can teach to the class...</h2>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-wrapper">
+                    <div class="card card-3" data-question="AI - Yay or Nay?">
+                        <div class="card-front card-face rounded-xl p-6 flex flex-col items-center justify-center gap-4">
+                            <svg class="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12h14M12 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="card-back card-face rounded-xl p-6">
+                            <h2 class="text-xl font-bold text-gray-800">AI - Yay or Nay?</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-wrapper">
+                    <div class="card card-4" data-question="A word to describe the new schedule.">
+                        <div class="card-front card-face rounded-xl p-6 flex flex-col items-center justify-center gap-4">
+                            <svg class="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div class="card-back card-face rounded-xl p-6">
+                            <h2 class="text-xl font-bold text-gray-800">A word to describe the new schedule.</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-wrapper">
+                    <div class="card card-5" data-question="What activity (besides sleeping) would you like to do in your free time in this class (without using phone)?">
+                        <div class="card-front card-face rounded-xl p-6 flex flex-col items-center justify-center gap-4">
+                            <svg class="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="card-back card-face rounded-xl p-6">
+                            <h2 class="text-xl font-bold text-gray-800">What activity (besides sleeping) would you like to do in your free time in this class (without using phone)?</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-wrapper">
+                    <div class="card card-6" data-question="What is one personal goal you have for this year?">
+                        <div class="card-front card-face rounded-xl p-6 flex flex-col items-center justify-center gap-4">
+                            <svg class="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                        </div>
+                        <div class="card-back card-face rounded-xl p-6">
+                            <h2 class="text-xl font-bold text-gray-800">What is one personal goal you have for this year?</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Answer Section (Hidden by default) -->
+            <div id="answerSection" class="hidden-section max-w-2xl mx-auto mt-12 fade-in">
+                <div class="bg-white p-8 rounded-xl shadow-xl">
+                    <h2 id="questionPrompt" class="text-2xl font-bold text-center text-gray-800 mb-6"></h2>
+                    <textarea id="answerInput" class="w-full h-24 p-4 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition-colors duration-200" placeholder="Type your answer here..."></textarea>
+                    
+                    <div class="flex justify-center space-x-4 mt-6">
+                        <button id="classBoardToggle" class="radio-button selected">Class Board</button>
+                        <button id="teacherBoardToggle" class="radio-button">Teacher Board</button>
+                    </div>
+
+                    <div class="mt-6 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button id="postButton" class="w-full sm:w-1/2 px-6 py-3 rounded-xl text-white font-bold bg-blue-500 hover:bg-blue-600 transition-colors duration-200">
+                            Post
+                        </button>
+                        <button id="anonButton" class="w-full sm:w-1/2 px-6 py-3 rounded-xl text-gray-700 font-bold bg-gray-200 hover:bg-gray-300 transition-colors duration-200">
+                            Post Anonymously
+                        </button>
+                    </div>
+
+                    <button id="backButton" class="mt-4 w-full px-6 py-3 rounded-xl text-gray-700 font-bold bg-gray-200 hover:bg-gray-300 transition-colors duration-200">
+                        Back
+                    </button>
+                </div>
+            </div>
+
+            <!-- Boards -->
+            <div id="boards-container" class="mt-16 flex flex-col items-center">
+                <div class="flex space-x-4 mb-6">
+                    <button id="viewClassBoardBtn" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition-colors duration-200">
+                        View Class Board
+                    </button>
+                    <button id="viewTeacherBoardBtn" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition-colors duration-200">
+                        View Teacher Board
+                    </button>
+                </div>
+                
+                <div id="classBoard" class="space-y-6 w-full max-w-3xl">
+                    <h2 class="text-3xl font-extrabold text-center text-gray-900 mb-6">Class Board</h2>
+                </div>
+                
+                <div id="teacherBoard" class="hidden-section space-y-6 w-full max-w-3xl">
+                    <h2 class="text-3xl font-extrabold text-center text-gray-900 mb-6">Teacher's Private Board</h2>
+                </div>
+            </div>
+
+        </div> <!-- End of mainUI -->
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase configuration and initialization (MANDATORY)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+        let app, db, auth;
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch (e) {
+            console.error("Firebase initialization failed:", e);
+        }
+
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const mainUI = document.getElementById('mainUI');
+        const cardContainer = document.getElementById('card-container');
+        const answerSection = document.getElementById('answerSection');
+        const questionPrompt = document.getElementById('questionPrompt');
+        const answerInput = document.getElementById('answerInput');
+        const postButton = document.getElementById('postButton');
+        const anonButton = document.getElementById('anonButton');
+        const backButton = document.getElementById('backButton');
+        const classBoard = document.getElementById('classBoard');
+        const teacherBoard = document.getElementById('teacherBoard');
+        const viewClassBoardBtn = document.getElementById('viewClassBoardBtn');
+        const viewTeacherBoardBtn = document.getElementById('viewTeacherBoardBtn');
+        const classBoardToggle = document.getElementById('classBoardToggle');
+        const teacherBoardToggle = document.getElementById('teacherBoardToggle');
+        const questionCards = document.querySelectorAll('.card');
+        
+        let currentQuestion = '';
+        let userId = null;
+        let isPostingToClassBoard = true;
+
+        // --- Firebase Authentication (MANDATORY) ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                loadingSpinner.style.display = 'none';
+                mainUI.classList.remove('hidden-section');
+                setupBoardListeners();
+            } else {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined') {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Firebase auth error:", error);
+                }
+            }
+        });
+
+        // --- UI Logic ---
+        questionCards.forEach(card => {
+            card.addEventListener('click', () => {
+                currentQuestion = card.dataset.question;
+                questionPrompt.textContent = currentQuestion;
+                
+                card.classList.add('is-flipped');
+                
+                setTimeout(() => {
+                    cardContainer.style.display = 'none';
+                    answerSection.classList.remove('hidden-section');
+                }, 800);
+            });
+        });
+
+        backButton.addEventListener('click', () => {
+            resetUI();
+        });
+
+        classBoardToggle.addEventListener('click', () => {
+            isPostingToClassBoard = true;
+            classBoardToggle.classList.add('selected');
+            teacherBoardToggle.classList.remove('selected');
+            anonButton.style.display = 'inline-flex';
+        });
+
+        teacherBoardToggle.addEventListener('click', () => {
+            isPostingToClassBoard = false;
+            classBoardToggle.classList.remove('selected');
+            teacherBoardToggle.classList.add('selected');
+            anonButton.style.display = 'none';
+        });
+
+        postButton.addEventListener('click', async () => {
+            const answer = answerInput.value.trim();
+            if (answer) {
+                await postAnswer(answer, false);
+                resetUI();
+            }
+        });
+
+        anonButton.addEventListener('click', async () => {
+            const answer = answerInput.value.trim();
+            if (answer) {
+                await postAnswer(answer, true);
+                resetUI();
+            }
+        });
+
+        viewClassBoardBtn.addEventListener('click', () => {
+            classBoard.classList.remove('hidden-section');
+            teacherBoard.classList.add('hidden-section');
+        });
+
+        viewTeacherBoardBtn.addEventListener('click', () => {
+            classBoard.classList.add('hidden-section');
+            teacherBoard.classList.remove('hidden-section');
+        });
+
+        function resetUI() {
+            answerInput.value = '';
+            answerSection.classList.add('hidden-section');
+            cardContainer.style.display = 'grid';
+            questionCards.forEach(card => card.classList.remove('is-flipped'));
+        }
+
+        // --- Firestore Logic ---
+        async function postAnswer(answer, isAnonymous) {
+            if (!db || !userId) {
+                console.error("Firestore or user not ready.");
+                return;
+            }
+            try {
+                let collectionPath = `/artifacts/${appId}/public/data/responses`;
+                let postUserId = isAnonymous ? 'Anonymous' : userId;
+
+                if (!isPostingToClassBoard) {
+                    // Explicitly override anonymous setting for the private board
+                    isAnonymous = false; 
+                    collectionPath = `/artifacts/${appId}/users/${userId}/teacher_responses`;
+                    postUserId = userId; // Teacher board is never anonymous
+                }
+
+                await addDoc(collection(db, collectionPath), {
+                    question: currentQuestion,
+                    answer: answer,
+                    userId: postUserId,
+                    timestamp: serverTimestamp()
+                });
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+        }
+        
+        function setupBoardListeners() {
+            if (!db) {
+                console.error("Firestore not ready.");
+                return;
+            }
+            // Listener for the Class Board
+            const classQ = query(collection(db, `/artifacts/${appId}/public/data/responses`));
+            onSnapshot(classQ, (snapshot) => {
+                classBoard.innerHTML = '<h2 class="text-3xl font-extrabold text-center text-gray-900 mb-6">Class Board</h2>';
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const responseElement = createBoardElement(data);
+                    classBoard.appendChild(responseElement);
+                });
+            });
+
+            // Listener for the Teacher's Private Board
+            const teacherQ = query(collection(db, `/artifacts/${appId}/users/${userId}/teacher_responses`));
+            onSnapshot(teacherQ, (snapshot) => {
+                teacherBoard.innerHTML = '<h2 class="text-3xl font-extrabold text-center text-gray-900 mb-6">Teacher\'s Private Board</h2>';
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const responseElement = createBoardElement(data);
+                    teacherBoard.appendChild(responseElement);
+                });
+            });
+        }
+        
+        function createBoardElement(data) {
+            const responseElement = document.createElement('div');
+            responseElement.className = 'bg-white p-6 rounded-xl shadow-md transition-transform transform hover:scale-105 fade-in';
+            responseElement.innerHTML = `
+                <h3 class="text-xl font-bold text-gray-900 mb-2">${data.question}</h3>
+                <p class="text-gray-700">${data.answer}</p>
+                <p class="mt-4 text-sm text-gray-500">
+                    — ${data.userId === 'Anonymous' ? 'Anonymous' : `User ID: ${data.userId}`}
+                </p>
+            `;
+            return responseElement;
+        }
+    </script>
+</body>
+</html>
